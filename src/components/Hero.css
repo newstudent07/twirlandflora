@@ -1,0 +1,129 @@
+.hero {
+  padding: clamp(1.75rem, 5vw, 3.5rem) 0;
+  background-color: transparent;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Coordinated Zoom-in Entrance */
+.hero-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  min-height: 520px;
+  
+  /* Initial hidden/zoomed state */
+  opacity: 0;
+  transform: scale(1.035);
+  will-change: transform, opacity;
+  transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1),
+              transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hero-loaded .hero-container {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-content {
+  flex: 1;
+  max-width: 540px;
+}
+
+.hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5.5vw, 4.25rem);
+  font-weight: 600;
+  line-height: 1.12;
+  color: var(--color-olive);
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.02em;
+}
+
+.hero-subtitle {
+  font-size: clamp(0.95rem, 2vw, 1.125rem);
+  color: var(--color-charcoal);
+  margin-bottom: clamp(1.25rem, 3vw, 2rem);
+  line-height: 1.6;
+  max-width: 95%;
+}
+
+.hero-image-wrapper {
+  flex: 1.2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.hero-image-arch {
+  width: 100%;
+  max-width: 650px;
+  height: clamp(340px, 50vw, 600px);
+  border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(79, 80, 57, 0.14);
+}
+
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.05);
+  transition: transform 1.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hero-loaded .hero-img {
+  transform: scale(1);
+}
+
+@media (max-width: 992px) {
+  .hero-container {
+    min-height: auto;
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .hero-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  .hero-content {
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-subtitle {
+    max-width: 100%;
+  }
+
+  .hero-image-wrapper {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: clamp(1.85rem, 8vw, 2.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-container, .hero-img {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

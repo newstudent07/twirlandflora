@@ -1,0 +1,111 @@
+/* ==========================================================================
+   AddToCartButton Styles
+   Editorial, tactile micro-interaction button with soft animation
+   ========================================================================== */
+
+.luxury-cart-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 124px;
+  height: 38px;
+  padding: 0 1.25rem;
+  border-radius: var(--radius-full, 9999px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: var(--color-olive, #4F5039);
+  color: #FFFFFF;
+  font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  box-shadow: 0 4px 14px rgba(79, 80, 57, 0.2);
+  transition:
+    background-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxury-cart-btn:hover:not(.is-added) {
+  background: var(--color-rose, #CA7D7C);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(202, 125, 124, 0.35);
+}
+
+.luxury-cart-btn.is-added {
+  background: #2D6A4F; /* Botanical calming deep forest emerald */
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 6px 22px rgba(45, 106, 79, 0.4),
+    0 0 12px rgba(45, 106, 79, 0.25);
+}
+
+.cart-btn-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.cart-plus-icon,
+.cart-check-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.cart-btn-text {
+  white-space: nowrap;
+}
+
+/* Soft ripple glow on activation */
+.luxury-cart-btn.is-added::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: var(--radius-full, 9999px);
+  background: rgba(255, 255, 255, 0.25);
+  animation: cartBtnRipple 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes cartBtnRipple {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+@media (max-width: 380px) {
+  .luxury-cart-btn {
+    min-width: 104px;
+    height: 36px;
+    padding: 0 0.85rem;
+    font-size: 0.75rem;
+  }
+  
+  .cart-plus-icon,
+  .cart-check-icon {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .luxury-cart-btn,
+  .cart-btn-content,
+  .cart-check-icon,
+  .luxury-cart-btn.is-added::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}

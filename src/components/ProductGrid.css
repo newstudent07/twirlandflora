@@ -1,0 +1,142 @@
+/* ==========================================================================
+   ProductGrid Styles - Editorial Best Sellers Showcase
+   ========================================================================== */
+
+.product-section {
+  padding: clamp(2rem, 5vw, 3.5rem) 0;
+  background-color: transparent;
+  position: relative;
+  z-index: 2;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  width: 100%;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  border-radius: var(--radius-lg, 1.5rem);
+  border: 1px solid rgba(79, 80, 57, 0.08);
+  box-shadow: 0 10px 30px rgba(79, 80, 57, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+              transform 0.3s ease;
+}
+
+.product-card:hover {
+  border-color: rgba(202, 125, 124, 0.35);
+  box-shadow: 0 20px 40px rgba(79, 80, 57, 0.12);
+  transform: translateY(-3px);
+}
+
+.product-image-container {
+  aspect-ratio: 4 / 4.75;
+  overflow: hidden;
+  background-color: var(--color-ivory, #FDF7ED);
+  padding: 0.75rem 0.75rem 0;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: calc(var(--radius-lg, 1.5rem) - 0.5rem);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  display: block;
+}
+
+.product-card:hover .product-img {
+  transform: scale(1.05);
+}
+
+/* Info container - strictly vertical column stack */
+.product-info {
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  flex: 1;
+}
+
+/* Row 1: Product Name & Rating Badge */
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.product-name {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  font-weight: 600;
+  color: var(--color-olive, #4F5039);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.product-rating {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-olive, #4F5039);
+  background: rgba(79, 80, 57, 0.08);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* Row 2: Price on the left, Add to Cart on the right with full clearance */
+.product-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(79, 80, 57, 0.08);
+  margin-top: auto;
+}
+
+.product-price {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-size: clamp(1.15rem, 2vw, 1.35rem);
+  font-weight: 700;
+  color: var(--color-olive, #4F5039);
+  white-space: nowrap;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 960px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .product-image-container {
+    padding: 0.5rem 0.5rem 0;
+  }
+
+  .product-info {
+    padding: 1rem 0.85rem 1.25rem;
+  }
+
+  .product-action {
+    gap: 0.5rem;
+  }
+}

@@ -1,0 +1,72 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid rgba(98, 93, 85, 0.05);
+}
+
+.nav-brand {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-olive);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: center;
+}
+
+.nav-link {
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-charcoal);
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: var(--color-olive);
+}
+
+
+
+/* Products Section */
+.section-title {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+/* Story Section */
+.story-section {
+  background-color: rgba(79, 80, 57, 0.03);
+  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2.5rem);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  margin: clamp(2rem, 5vw, 3.5rem) 0;
+}
+
+.story-content {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.story-text {
+  font-size: clamp(1.05rem, 2.8vw, 1.35rem);
+  color: var(--color-olive);
+  font-family: var(--font-heading);
+  line-height: 1.8;
+  margin-bottom: var(--spacing-md);
+}

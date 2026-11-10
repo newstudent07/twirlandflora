@@ -1,0 +1,517 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap');
+
+/* Scoped 404 Story Page Styles */
+.cute-404-page {
+  --berry: #a43f4c;
+  --ink: #3f312f;
+  position: relative;
+  display: grid;
+  min-height: calc(100vh - 80px);
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  color: #3f312f;
+  background:
+    radial-gradient(circle at 9% 13%, rgb(164 63 76 / 5%) 0 2px, transparent 3px),
+    radial-gradient(circle at 82% 22%, rgb(63 49 47 / 5%) 0 1px, transparent 2px),
+    #f8f2e7;
+  box-sizing: border-box;
+}
+
+.cute-404-page * {
+  box-sizing: border-box;
+}
+
+.cute-404-page::before {
+  position: absolute;
+  inset: 12px;
+  z-index: 3;
+  border: 1px solid rgb(122 91 79 / 24%);
+  border-radius: 22px;
+  content: '';
+  pointer-events: none;
+}
+
+.cute-404-page .cute-404-header,
+.cute-404-page .header {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 38px 56px 12px;
+}
+
+.cute-404-page .cute-404-brand,
+.cute-404-page .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  font-family: 'DM Serif Display', serif;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  color: inherit;
+  text-decoration: none;
+}
+
+.cute-404-page .cute-404-brand__mark,
+.cute-404-page .brand__mark {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  transform: rotate(45deg);
+}
+
+.cute-404-page .cute-404-brand__mark span,
+.cute-404-page .brand__mark span {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 9px 9px 2px;
+  background: var(--berry);
+}
+
+.cute-404-page .cute-404-brand__mark span:nth-child(1),
+.cute-404-page .brand__mark span:nth-child(1) {
+  top: 1px;
+  left: 1px;
+}
+
+.cute-404-page .cute-404-brand__mark span:nth-child(2),
+.cute-404-page .brand__mark span:nth-child(2) {
+  top: 1px;
+  right: 1px;
+  transform: rotate(90deg);
+}
+
+.cute-404-page .cute-404-brand__mark span:nth-child(3),
+.cute-404-page .brand__mark span:nth-child(3) {
+  right: 1px;
+  bottom: 1px;
+  transform: rotate(180deg);
+}
+
+.cute-404-page .cute-404-brand__mark span:nth-child(4),
+.cute-404-page .brand__mark span:nth-child(4) {
+  bottom: 1px;
+  left: 1px;
+  transform: rotate(270deg);
+}
+
+.cute-404-page .cute-404-header__link,
+.cute-404-page .header__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border-bottom: 1px solid rgb(63 49 47 / 45%);
+  padding-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    gap 180ms ease,
+    color 180ms ease;
+}
+
+.cute-404-page .cute-404-header__link svg,
+.cute-404-page .header__link svg,
+.cute-404-page .cute-404-home-button svg,
+.cute-404-page .home-button svg {
+  width: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.cute-404-page .cute-404-header__link:hover,
+.cute-404-page .header__link:hover {
+  gap: 13px;
+  color: var(--berry);
+}
+
+.cute-404-page .cute-404-hero,
+.cute-404-page .hero {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  align-self: center;
+  padding: 30px 24px 250px;
+  text-align: center;
+}
+
+.cute-404-page .cute-404-eyebrow,
+.cute-404-page .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 -18px;
+  color: #856a60;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.23em;
+  text-transform: uppercase;
+}
+
+.cute-404-page .cute-404-eyebrow span,
+.cute-404-page .eyebrow span {
+  color: #d38c79;
+  font-size: 14px;
+}
+
+.cute-404-page .cute-404-error-code,
+.cute-404-page .error-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(150px, 22vw, 260px);
+  color: var(--berry);
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(180px, 24vw, 340px);
+  line-height: 0.8;
+  letter-spacing: -0.09em;
+}
+
+.cute-404-page .cute-404-error-code__flower,
+.cute-404-page .error-code__flower {
+  position: relative;
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin: 0 0.04em;
+  animation: cute-404-gentle-turn 18s linear infinite;
+}
+
+.cute-404-page .cute-404-error-code__flower::before,
+.cute-404-page .cute-404-error-code__flower::after,
+.cute-404-page .cute-404-error-code__flower i::before,
+.cute-404-page .cute-404-error-code__flower i::after,
+.cute-404-page .error-code__flower::before,
+.cute-404-page .error-code__flower::after,
+.cute-404-page .error-code__flower i::before,
+.cute-404-page .error-code__flower i::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 35%;
+  height: 57%;
+  border-radius: 50% 50% 45% 45%;
+  background: #d98580;
+  content: '';
+  transform-origin: 50% 0;
+}
+
+.cute-404-page .cute-404-error-code__flower::before,
+.cute-404-page .error-code__flower::before {
+  transform: rotate(0deg) translate(-50%, -96%);
+}
+
+.cute-404-page .cute-404-error-code__flower::after,
+.cute-404-page .error-code__flower::after {
+  transform: rotate(90deg) translate(-50%, -96%);
+}
+
+.cute-404-page .cute-404-error-code__flower i::before,
+.cute-404-page .error-code__flower i::before {
+  transform: rotate(180deg) translate(-50%, -96%);
+}
+
+.cute-404-page .cute-404-error-code__flower i::after,
+.cute-404-page .error-code__flower i::after {
+  transform: rotate(270deg) translate(-50%, -96%);
+}
+
+.cute-404-page .cute-404-error-code__flower i,
+.cute-404-page .error-code__flower i {
+  position: absolute;
+  inset: 36%;
+  z-index: 1;
+  border-radius: 50%;
+  background: #efbd49;
+}
+
+.cute-404-page .cute-404-message,
+.cute-404-page .message {
+  position: relative;
+  z-index: 2;
+  max-width: 590px;
+  margin-top: -2px;
+}
+
+.cute-404-page .cute-404-message h1,
+.cute-404-page .message h1 {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(32px, 4.1vw, 58px);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.cute-404-page .cute-404-message p,
+.cute-404-page .message p {
+  max-width: 465px;
+  margin: 18px auto 25px;
+  color: #74615a;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.cute-404-page .cute-404-home-button,
+.cute-404-page .home-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 176px;
+  border: 1px solid var(--berry);
+  border-radius: 999px;
+  padding: 14px 23px;
+  color: #fffaf0;
+  background: var(--berry);
+  box-shadow: 0 8px 22px rgb(112 47 55 / 14%);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.cute-404-page .cute-404-home-button:hover,
+.cute-404-page .home-button:hover {
+  background: #8c3440;
+  box-shadow: 0 12px 26px rgb(112 47 55 / 22%);
+  transform: translateY(-2px);
+  color: #fffaf0;
+}
+
+.cute-404-page .cute-404-home-button:focus-visible,
+.cute-404-page .cute-404-header__link:focus-visible,
+.cute-404-page .cute-404-brand:focus-visible,
+.cute-404-page .home-button:focus-visible,
+.cute-404-page .header__link:focus-visible,
+.cute-404-page .brand:focus-visible {
+  outline: 3px solid rgb(164 63 76 / 28%);
+  outline-offset: 5px;
+}
+
+.cute-404-page .cute-404-garden,
+.cute-404-page .garden {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  z-index: 1;
+  width: max(100%, 1050px);
+  height: min(34vh, 330px);
+  transform: translateX(-50%);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cute-404-page .cute-404-garden__stems,
+.cute-404-page .garden__stems {
+  stroke-width: 3;
+}
+
+.cute-404-page .cute-404-garden__ground,
+.cute-404-page .garden__ground {
+  fill: #e6b866;
+}
+
+.cute-404-page .cute-404-garden__flowers use,
+.cute-404-page .garden__flowers use {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: cute-404-flower-sway 5s ease-in-out infinite alternate;
+}
+
+.cute-404-page .cute-404-garden__flowers use:nth-child(even),
+.cute-404-page .garden__flowers use:nth-child(even) {
+  animation-delay: -2.4s;
+}
+
+.cute-404-page .cute-404-side-note,
+.cute-404-page .side-note {
+  position: absolute;
+  top: 49%;
+  z-index: 2;
+  margin: 0;
+  color: #a28a7d;
+  font-family: 'DM Serif Display', serif;
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  writing-mode: vertical-rl;
+}
+
+.cute-404-page .cute-404-side-note--left,
+.cute-404-page .side-note--left {
+  left: 34px;
+  transform: rotate(180deg);
+}
+
+.cute-404-page .cute-404-side-note--right,
+.cute-404-page .side-note--right {
+  right: 34px;
+}
+
+@keyframes cute-404-gentle-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cute-404-flower-sway {
+  from {
+    rotate: -1.5deg;
+  }
+  to {
+    rotate: 2deg;
+  }
+}
+
+@media (max-height: 760px) and (min-width: 700px) {
+  .cute-404-page .cute-404-hero,
+  .cute-404-page .hero {
+    padding-top: 6px;
+    padding-bottom: 190px;
+  }
+
+  .cute-404-page .cute-404-error-code,
+  .cute-404-page .error-code {
+    height: 145px;
+    font-size: 190px;
+  }
+
+  .cute-404-page .cute-404-message h1,
+  .cute-404-page .message h1 {
+    font-size: 40px;
+  }
+
+  .cute-404-page .cute-404-message p,
+  .cute-404-page .message p {
+    margin-block: 11px 16px;
+  }
+
+  .cute-404-page .cute-404-garden,
+  .cute-404-page .garden {
+    height: 235px;
+  }
+}
+
+@media (max-width: 700px) {
+  .cute-404-page::before {
+    inset: 8px;
+    border-radius: 17px;
+  }
+
+  .cute-404-page .cute-404-header,
+  .cute-404-page .header {
+    padding: 28px 25px 8px;
+  }
+
+  .cute-404-page .cute-404-brand,
+  .cute-404-page .brand {
+    font-size: 18px;
+  }
+
+  .cute-404-page .cute-404-brand__mark,
+  .cute-404-page .brand__mark {
+    width: 21px;
+    height: 21px;
+  }
+
+  .cute-404-page .cute-404-brand__mark span,
+  .cute-404-page .brand__mark span {
+    width: 9px;
+    height: 9px;
+  }
+
+  .cute-404-page .cute-404-header__link,
+  .cute-404-page .header__link {
+    width: 39px;
+    height: 39px;
+    justify-content: center;
+    border: 1px solid rgb(63 49 47 / 35%);
+    border-radius: 50%;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .cute-404-page .cute-404-hero,
+  .cute-404-page .hero {
+    align-self: start;
+    padding: max(9vh, 60px) 26px 260px;
+  }
+
+  .cute-404-page .cute-404-eyebrow,
+  .cute-404-page .eyebrow {
+    margin-bottom: 5px;
+  }
+
+  .cute-404-page .cute-404-error-code,
+  .cute-404-page .error-code {
+    height: 120px;
+    font-size: clamp(138px, 42vw, 178px);
+  }
+
+  .cute-404-page .cute-404-message,
+  .cute-404-page .message {
+    margin-top: 15px;
+  }
+
+  .cute-404-page .cute-404-message h1,
+  .cute-404-page .message h1 {
+    font-size: clamp(35px, 10vw, 46px);
+  }
+
+  .cute-404-page .cute-404-message p,
+  .cute-404-page .message p {
+    max-width: 340px;
+    margin-block: 15px 22px;
+    font-size: 13px;
+  }
+
+  .cute-404-page .cute-404-garden,
+  .cute-404-page .garden {
+    left: 48%;
+    width: 950px;
+    height: 250px;
+  }
+
+  .cute-404-page .cute-404-side-note,
+  .cute-404-page .side-note {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cute-404-page .cute-404-error-code__flower,
+  .cute-404-page .error-code__flower,
+  .cute-404-page .cute-404-garden__flowers use,
+  .cute-404-page .garden__flowers use {
+    animation: none;
+  }
+
+  .cute-404-page .cute-404-home-button,
+  .cute-404-page .home-button,
+  .cute-404-page .cute-404-header__link,
+  .cute-404-page .header__link {
+    transition: none;
+  }
+}
+
