@@ -16,6 +16,7 @@ const Home = () => {
       id: 1,
       name: "The Peony Paradigm",
       price: "₹85",
+      numericPrice: 85,
       rating: "★ 4.9",
       image: "/product1.jpg"
     },
@@ -23,6 +24,7 @@ const Home = () => {
       id: 2,
       name: "Midsummer Night",
       price: "₹110",
+      numericPrice: 110,
       rating: "★ 4.8",
       image: "/product2.jpg"
     },
@@ -30,6 +32,7 @@ const Home = () => {
       id: 3,
       name: "Blushing Elegance",
       price: "₹95",
+      numericPrice: 95,
       rating: "★ 5.0",
       image: "/hero_floral.jpg"
     }

@@ -7,6 +7,7 @@
   position: relative;
   display: grid;
   min-height: calc(100vh - 80px);
+  min-height: calc(100dvh - 86px);
   grid-template-rows: auto 1fr;
   overflow: hidden;
   font-family: 'DM Sans', sans-serif;
@@ -421,7 +422,7 @@
 
   .cute-404-page .cute-404-header,
   .cute-404-page .header {
-    padding: 28px 25px 8px;
+    padding: 22px 22px 8px;
   }
 
   .cute-404-page .cute-404-brand,
@@ -443,8 +444,8 @@
 
   .cute-404-page .cute-404-header__link,
   .cute-404-page .header__link {
-    width: 39px;
-    height: 39px;
+    width: 40px;
+    height: 40px;
     justify-content: center;
     border: 1px solid rgb(63 49 47 / 35%);
     border-radius: 50%;
@@ -454,43 +455,143 @@
 
   .cute-404-page .cute-404-hero,
   .cute-404-page .hero {
-    align-self: start;
-    padding: max(9vh, 60px) 26px 260px;
+    align-self: center;
+    padding: clamp(16px, 4dvh, 42px) 22px clamp(165px, 25dvh, 215px);
   }
 
   .cute-404-page .cute-404-eyebrow,
   .cute-404-page .eyebrow {
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
 
   .cute-404-page .cute-404-error-code,
   .cute-404-page .error-code {
-    height: 120px;
-    font-size: clamp(138px, 42vw, 178px);
+    height: clamp(92px, 26vw, 126px);
+    font-size: clamp(106px, 34vw, 168px);
   }
 
   .cute-404-page .cute-404-message,
   .cute-404-page .message {
-    margin-top: 15px;
+    margin-top: 12px;
   }
 
   .cute-404-page .cute-404-message h1,
   .cute-404-page .message h1 {
-    font-size: clamp(35px, 10vw, 46px);
+    font-size: clamp(28px, 8.6vw, 44px);
   }
 
   .cute-404-page .cute-404-message p,
   .cute-404-page .message p {
     max-width: 340px;
-    margin-block: 15px 22px;
+    margin-block: 12px 18px;
     font-size: 13px;
+    line-height: 1.65;
   }
 
   .cute-404-page .cute-404-garden,
   .cute-404-page .garden {
-    left: 48%;
-    width: 950px;
-    height: 250px;
+    left: 50%;
+    width: max(100%, 660px);
+    height: clamp(155px, 23dvh, 225px);
+  }
+
+  .cute-404-page .cute-404-side-note,
+  .cute-404-page .side-note {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .cute-404-page::before {
+    inset: 6px;
+    border-radius: 14px;
+  }
+
+  .cute-404-page .cute-404-header,
+  .cute-404-page .header {
+    padding: 18px 18px 6px;
+  }
+
+  .cute-404-page .cute-404-brand,
+  .cute-404-page .brand {
+    font-size: 16px;
+    gap: 8px;
+  }
+
+  .cute-404-page .cute-404-hero,
+  .cute-404-page .hero {
+    padding: 12px 16px clamp(145px, 24dvh, 178px);
+  }
+
+  .cute-404-page .cute-404-message h1,
+  .cute-404-page .message h1 {
+    font-size: clamp(26px, 8.4vw, 34px);
+  }
+
+  .cute-404-page .cute-404-home-button,
+  .cute-404-page .home-button {
+    min-width: 158px;
+    padding: 12px 20px;
+    font-size: 11px;
+  }
+
+  .cute-404-page .cute-404-garden,
+  .cute-404-page .garden {
+    width: 600px;
+    height: clamp(140px, 22dvh, 185px);
+  }
+}
+
+@media (max-height: 540px) {
+  .cute-404-page .cute-404-header,
+  .cute-404-page .header {
+    padding: 14px 24px 4px;
+  }
+
+  .cute-404-page .cute-404-hero,
+  .cute-404-page .hero {
+    align-self: center;
+    padding: 6px 20px 104px;
+  }
+
+  .cute-404-page .cute-404-eyebrow,
+  .cute-404-page .eyebrow {
+    margin-bottom: -4px;
+    font-size: 10px;
+  }
+
+  .cute-404-page .cute-404-error-code,
+  .cute-404-page .error-code {
+    height: 78px;
+    font-size: 96px;
+  }
+
+  .cute-404-page .cute-404-message,
+  .cute-404-page .message {
+    margin-top: 4px;
+  }
+
+  .cute-404-page .cute-404-message h1,
+  .cute-404-page .message h1 {
+    font-size: clamp(24px, 4.5vw, 32px);
+  }
+
+  .cute-404-page .cute-404-message p,
+  .cute-404-page .message p {
+    margin-block: 6px 12px;
+    font-size: 12.5px;
+    line-height: 1.45;
+  }
+
+  .cute-404-page .cute-404-home-button,
+  .cute-404-page .home-button {
+    padding: 10px 18px;
+  }
+
+  .cute-404-page .cute-404-garden,
+  .cute-404-page .garden {
+    height: 118px;
+    width: min(100%, 820px);
   }
 
   .cute-404-page .cute-404-side-note,

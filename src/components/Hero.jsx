@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Carousel_002 } from '@/components/v1/skiper48';
+import { useFineHover } from '@/lib/useFineHover';
 import KeychainHeroVisual from './KeychainHeroVisual';
 import './Hero.css';
 
@@ -13,6 +14,7 @@ const Hero = ({
   onActionClick = null,
 }) => {
   const [loaded, setLoaded] = useState(false);
+  const fineHover = useFineHover();
 
   useEffect(() => {
     // Trigger animation reliably after mount
@@ -73,9 +75,10 @@ const Hero = ({
           <h1 className="hero-title">{title}</h1>
           <p className="hero-subtitle">{subtitle}</p>
           <motion.button
+            type="button"
             className="btn btn-primary"
             onClick={handleActionClick}
-            whileHover={{ scale: 1.04, boxShadow: "0 8px 24px rgba(202, 125, 124, 0.4)" }}
+            whileHover={fineHover ? { scale: 1.04, boxShadow: "0 8px 24px rgba(202, 125, 124, 0.4)" } : undefined}
             whileTap={{ scale: 0.96 }}
           >
             Shop the Collection

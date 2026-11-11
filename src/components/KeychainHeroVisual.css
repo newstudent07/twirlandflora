@@ -241,6 +241,7 @@
 .specs-content {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .specs-label {
@@ -339,85 +340,137 @@
 @media (max-width: 768px) {
   .keychain-visual-container {
     max-width: 100%;
-    margin-top: var(--spacing-md, 24px);
+    margin-top: var(--spacing-sm, 12px);
   }
 
   .keychain-card-stage {
-    width: min(320px, calc(100vw - 56px));
-    height: 420px;
+    width: min(312px, calc(100vw - 56px));
+    height: clamp(340px, 52vh, 410px);
+    cursor: default;
   }
 
   .keychain-floating-badge {
     top: 14px;
-    right: 8px;
-    padding: 6px 14px;
+    right: 6px;
+    padding: 6px 12px;
   }
 
   .badge-text {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
   }
 
   .keychain-specs-card {
-    bottom: 16px;
-    left: 8px;
-    padding: 8px 14px;
+    bottom: 14px;
+    left: 6px;
+    padding: 8px 12px;
+    max-width: calc(100% - 92px);
+    gap: 8px;
   }
 
   .specs-title {
-    font-size: 0.825rem;
+    font-size: 0.8rem;
+    white-space: normal;
+    line-height: 1.25;
   }
 
   .keychain-artisan-seal {
-    bottom: -12px;
-    right: -8px;
-    width: 82px;
-    height: 82px;
+    bottom: -10px;
+    right: -6px;
+    width: 78px;
+    height: 78px;
   }
 }
 
 @media (max-width: 480px) {
   .keychain-card-stage {
-    width: min(270px, calc(100vw - 36px));
-    height: 360px;
+    width: min(268px, calc(100vw - 44px));
+    height: clamp(300px, 48vh, 355px);
   }
 
   .keychain-floating-badge {
-    display: none; /* Clean presentation on very small screens */
+    display: none; /* Clean presentation on small phones */
   }
 
   .keychain-specs-card {
-    bottom: 12px;
+    bottom: 10px;
     left: 6px;
     padding: 6px 10px;
+    border-radius: 14px;
+    max-width: calc(100% - 76px);
+  }
+
+  .specs-dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+  }
+
+  .specs-label {
+    font-size: 0.6rem;
   }
 
   .specs-title {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
   }
 
   .keychain-artisan-seal {
-    width: 68px;
-    height: 68px;
+    width: 64px;
+    height: 64px;
     bottom: -8px;
-    right: -6px;
+    right: -4px;
   }
 }
 
 @media (max-width: 360px) {
   .keychain-card-stage {
-    width: min(230px, calc(100vw - 24px));
-    height: 310px;
+    width: min(228px, calc(100vw - 32px));
+    height: clamp(265px, 45vh, 305px);
   }
 
   .keychain-specs-card {
     bottom: 8px;
     left: 4px;
-    padding: 4px 8px;
+    padding: 5px 8px;
+    max-width: calc(100% - 62px);
+  }
+
+  .specs-title {
+    font-size: 0.68rem;
   }
 
   .keychain-artisan-seal {
-    width: 58px;
-    height: 58px;
+    width: 54px;
+    height: 54px;
+    bottom: -6px;
+    right: -2px;
+  }
+}
+
+@media (max-height: 520px) and (max-width: 960px) {
+  .keychain-card-stage {
+    width: min(240px, 38vw);
+    height: min(300px, 68dvh);
+  }
+
+  .keychain-floating-badge {
+    display: none;
+  }
+
+  .keychain-specs-card {
+    bottom: 8px;
+    left: 6px;
+    padding: 6px 10px;
+    max-width: calc(100% - 68px);
+  }
+
+  .specs-title {
+    font-size: 0.72rem;
+    white-space: normal;
+  }
+
+  .keychain-artisan-seal {
+    width: 56px;
+    height: 56px;
     bottom: -6px;
     right: -4px;
   }

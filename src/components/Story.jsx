@@ -107,7 +107,11 @@ export default function Story() {
           <span>Twirl &amp; Flora</span>
         </Link>
 
-        <Link className="cute-404-header__link header__link" to="/">
+        <Link
+          className="cute-404-header__link header__link"
+          to="/"
+          aria-label="Back to the garden"
+        >
           Back to the garden
           <Arrow />
         </Link>

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { useCart } from '../context/useCart';
 import './CartDrawer.css';
 
@@ -20,8 +21,21 @@ const CartDrawer = () => {
   } = useCart();
 
   const [checkoutMessage, setCheckoutMessage] = useState(false);
+  const checkoutTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (checkoutTimerRef.current) {
+        clearTimeout(checkoutTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleClose = () => {
+    if (checkoutTimerRef.current) {
+      clearTimeout(checkoutTimerRef.current);
+      checkoutTimerRef.current = null;
+    }
     setCheckoutMessage(false);
     closeCart();
   };
@@ -40,12 +54,12 @@ const CartDrawer = () => {
   // Lock body scroll when cart is open
   useEffect(() => {
     if (isCartOpen) {
-      document.body.style.overflow = 'hidden';
+      lockBodyScroll('cart-drawer');
     } else {
-      document.body.style.overflow = '';
+      unlockBodyScroll('cart-drawer');
     }
     return () => {
-      document.body.style.overflow = '';
+      unlockBodyScroll('cart-drawer');
     };
   }, [isCartOpen]);
 
@@ -54,9 +68,13 @@ const CartDrawer = () => {
   }
 
   const handleCheckout = () => {
+    if (checkoutTimerRef.current) {
+      clearTimeout(checkoutTimerRef.current);
+    }
     setCheckoutMessage(true);
-    setTimeout(() => {
+    checkoutTimerRef.current = setTimeout(() => {
       setCheckoutMessage(false);
+      checkoutTimerRef.current = null;
     }, 4000);
   };
 

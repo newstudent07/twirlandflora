@@ -29,10 +29,12 @@
     box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.luxury-cart-btn:hover:not(.is-added) {
-  background: var(--color-rose, #CA7D7C);
-  border-color: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 6px 20px rgba(202, 125, 124, 0.35);
+@media (hover: hover) and (pointer: fine) {
+  .luxury-cart-btn:hover:not(.is-added) {
+    background: var(--color-rose, #CA7D7C);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 6px 20px rgba(202, 125, 124, 0.35);
+  }
 }
 
 .luxury-cart-btn.is-added {
@@ -86,16 +88,24 @@
 
 @media (max-width: 380px) {
   .luxury-cart-btn {
-    min-width: 104px;
+    min-width: 102px;
     height: 36px;
     padding: 0 0.85rem;
     font-size: 0.75rem;
   }
-  
+
   .cart-plus-icon,
   .cart-check-icon {
     width: 13px;
     height: 13px;
+  }
+}
+
+@media (max-width: 320px) {
+  .luxury-cart-btn {
+    min-width: 92px;
+    padding: 0 0.65rem;
+    font-size: 0.72rem;
   }
 }
 

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence, useScroll } from 'framer-motion';
+import { useFineHover } from '@/lib/useFineHover';
 import Hero from '../components/Hero';
 import Footer from '../components/Footer';
 import AddToCartButton from '../components/AddToCartButton';
@@ -367,8 +368,10 @@ const CATEGORY_CONFIG = {
 const CategoryPage = () => {
   const { categoryId } = useParams();
   const { scrollYProgress } = useScroll();
+  const fineHover = useFineHover();
   const [activeFilter, setActiveFilter] = useState('all');
   const [addedItem, setAddedItem] = useState(null);
+  const toastTimerRef = useRef(null);
 
   // Format and normalize category slug safely
   const rawSlug = (categoryId || 'all-flowers').toLowerCase();
@@ -498,10 +501,18 @@ const CategoryPage = () => {
     setActiveFilter('all');
   }
 
-  // Scroll to top when category changes
+  // Scroll to top when category changes and cleanup active toast timer
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, [normalizedKey]);
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
 
   // Flexible Filter logic
   const filteredProducts = useMemo(() => {
@@ -519,9 +530,13 @@ const CategoryPage = () => {
   }, [config.products, activeFilter]);
 
   const handleAddToCart = (product) => {
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
     setAddedItem(product.name);
-    setTimeout(() => {
+    toastTimerRef.current = setTimeout(() => {
       setAddedItem(null);
+      toastTimerRef.current = null;
     }, 2400);
   };
 
@@ -664,7 +679,7 @@ const CategoryPage = () => {
                     initial="hidden"
                     animate="visible"
                     exit="exit"
-                    whileHover={{ y: -8, transition: { duration: 0.3, ease: 'easeOut' } }}
+                    whileHover={fineHover ? { y: -8, transition: { duration: 0.3, ease: 'easeOut' } } : undefined}
                     className="category-card"
                   >
                     <div className="category-image-wrap">
@@ -675,7 +690,7 @@ const CategoryPage = () => {
                         alt={product.name}
                         className="category-card-img"
                         loading="lazy"
-                        whileHover={{ scale: 1.05 }}
+                        whileHover={fineHover ? { scale: 1.05 } : undefined}
                         transition={{ duration: 0.5, ease: 'easeOut' }}
                       />
                     </div>

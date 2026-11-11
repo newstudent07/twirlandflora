@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { lockBodyScroll, unlockBodyScroll } from '@/lib/bodyScrollLock';
 import { SearchContext } from './SearchContextBase';
 
 export const SearchProvider = ({ children }) => {
@@ -45,12 +46,12 @@ export const SearchProvider = ({ children }) => {
   // Lock body scroll when search modal is open
   useEffect(() => {
     if (isSearchOpen) {
-      document.body.style.overflow = 'hidden';
+      lockBodyScroll('search-modal');
     } else {
-      document.body.style.overflow = '';
+      unlockBodyScroll('search-modal');
     }
     return () => {
-      document.body.style.overflow = '';
+      unlockBodyScroll('search-modal');
     };
   }, [isSearchOpen]);
 

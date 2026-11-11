@@ -5,10 +5,10 @@
 .footer {
   position: relative;
   border-top: 1px solid rgba(79, 80, 57, 0.1);
-  padding: 4.5rem 0 3rem;
+  padding: 4.5rem 0 3.25rem;
   margin-top: auto;
   background: transparent;
-  overflow: hidden;
+  overflow-x: clip;
 }
 
 .footer-container {
@@ -22,12 +22,6 @@
 
 .footer-content {
   display: grid;
-  /* 
-     Asymmetrical editorial grid:
-     Left column: comfortably sized for brand, description, and socials
-     Gap: provides a dedicated channel for the animated scroll vine to curve through
-     Right column: generous space for journal heading, subtitle, and input form
-  */
   grid-template-columns: minmax(220px, 280px) 1fr;
   column-gap: 5.5rem;
   row-gap: 2.5rem;
@@ -39,6 +33,7 @@
   display: flex;
   flex-direction: column;
   max-width: 280px;
+  min-width: 0;
 }
 
 .footer-brand {
@@ -63,11 +58,12 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .footer-social-links .social-icon {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -77,22 +73,32 @@
   color: var(--color-olive, #4F5039);
   transition: all 0.25s ease;
   text-decoration: none;
+  cursor: pointer;
 }
 
-.footer-social-links .social-icon:hover {
-  background: var(--color-rose, #CA7D7C);
-  border-color: var(--color-rose, #CA7D7C);
-  color: #FFFFFF;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(202, 125, 124, 0.3);
+@media (hover: hover) and (pointer: fine) {
+  .footer-social-links .social-icon:hover {
+    background: var(--color-rose, #CA7D7C);
+    border-color: var(--color-rose, #CA7D7C);
+    color: #FFFFFF;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(202, 125, 124, 0.3);
+  }
 }
 
+.footer-social-notice {
+  margin: 0.75rem 0 0;
+  font-size: 0.78rem;
+  color: var(--color-olive, #4F5039);
+  line-height: 1.45;
+}
 
 /* Right Column: Join Our Journal */
 .footer-journal-col {
   max-width: 520px;
   margin-left: auto;
   width: 100%;
+  min-width: 0;
 }
 
 .footer-journal-heading {
@@ -116,10 +122,12 @@
   display: flex;
   gap: 0.75rem;
   align-items: center;
+  min-width: 0;
 }
 
 .footer-input-pill {
   flex: 1;
+  min-width: 0;
   padding: 0.85rem 1.4rem;
   border-radius: var(--radius-full, 9999px);
   border: 1px solid rgba(79, 80, 57, 0.18);
@@ -142,6 +150,22 @@
   white-space: nowrap;
   font-size: 0.8125rem;
   letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.footer-subscribe-feedback {
+  margin: 0.65rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.footer-subscribe-feedback.is-success {
+  color: #2D6A4F;
+}
+
+.footer-subscribe-feedback.is-error {
+  color: #B91C1C;
 }
 
 /* Bottom Bar */
@@ -162,15 +186,23 @@
 .footer-bottom-links {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.85rem;
 }
 
-.footer-bottom-links a {
+.footer-policy-btn {
   color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+  background: none;
+  border: none;
+  padding: 0.2rem 0.1rem;
+  cursor: pointer;
   transition: color 0.2s ease;
 }
 
-.footer-bottom-links a:hover {
+.footer-policy-btn:hover {
   color: var(--color-rose, #CA7D7C);
 }
 
@@ -179,27 +211,120 @@
   opacity: 0.5;
 }
 
+/* Policy & Care Modal */
+.footer-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(30, 29, 25, 0.56);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+}
+
+.footer-modal-panel {
+  width: 100%;
+  max-width: 480px;
+  max-height: 85dvh;
+  overflow-y: auto;
+  background: var(--color-ivory, #FDF7ED);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(79, 80, 57, 0.15);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.24);
+}
+
+.footer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.2rem 1.35rem;
+  background: #FFFFFF;
+  border-bottom: 1px solid rgba(79, 80, 57, 0.1);
+}
+
+.footer-modal-kicker {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-rose, #CA7D7C);
+  margin-bottom: 0.15rem;
+}
+
+.footer-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--color-olive, #4F5039);
+}
+
+.footer-modal-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(79, 80, 57, 0.06);
+  color: var(--color-olive, #4F5039);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.footer-modal-close:hover {
+  background: var(--color-rose, #CA7D7C);
+  color: #FFFFFF;
+}
+
+.footer-modal-body {
+  padding: 1.25rem 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.footer-modal-body p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--color-charcoal, #625D55);
+}
+
 /* Responsive adjustments */
 @media (max-width: 900px) {
   .footer-content {
     grid-template-columns: 1fr;
     column-gap: 0;
-    row-gap: 2.5rem;
+    row-gap: 2.25rem;
   }
-  
+
+  .footer-brand-col {
+    max-width: 100%;
+  }
+
   .footer-journal-col {
     margin-left: 0;
     max-width: 100%;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .footer {
-    padding: 3rem 0 2rem;
+    padding: 3rem 0 max(5.75rem, calc(5.25rem + env(safe-area-inset-bottom)));
   }
 
+  .footer-input-pill {
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+  }
+}
+
+@media (max-width: 600px) {
   .footer-container {
-    padding: 0 1.25rem;
+    padding: 0 1.15rem;
   }
 
   .footer-newsletter-form {
@@ -211,16 +336,29 @@
   .footer-input-pill {
     font-size: 16px; /* Prevents iOS auto-zoom */
     padding: 0.85rem 1.25rem;
+    width: 100%;
   }
-  
+
   .footer-subscribe-btn {
     width: 100%;
     padding: 0.85rem;
   }
 
   .footer-bottom {
+    margin-top: 2.5rem;
     flex-direction: column;
     text-align: center;
     gap: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .footer-container {
+    padding: 0 0.85rem;
+  }
+
+  .footer-bottom-links {
+    font-size: 0.76rem;
+    gap: 0.35rem 0.65rem;
   }
 }

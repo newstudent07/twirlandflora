@@ -19,6 +19,7 @@
 .product-card {
   display: flex;
   flex-direction: column;
+  min-width: 0;
   background: #FFFFFF;
   border-radius: var(--radius-lg, 1.5rem);
   border: 1px solid rgba(79, 80, 57, 0.08);
@@ -27,12 +28,6 @@
   transition: box-shadow 0.4s cubic-bezier(0.25, 1, 0.5, 1),
               border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1),
               transform 0.3s ease;
-}
-
-.product-card:hover {
-  border-color: rgba(202, 125, 124, 0.35);
-  box-shadow: 0 20px 40px rgba(79, 80, 57, 0.12);
-  transform: translateY(-3px);
 }
 
 .product-image-container {
@@ -51,8 +46,16 @@
   display: block;
 }
 
-.product-card:hover .product-img {
-  transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover {
+    border-color: rgba(202, 125, 124, 0.35);
+    box-shadow: 0 20px 40px rgba(79, 80, 57, 0.12);
+    transform: translateY(-3px);
+  }
+
+  .product-card:hover .product-img {
+    transform: scale(1.05);
+  }
 }
 
 /* Info container - strictly vertical column stack */
@@ -61,6 +64,7 @@
   flex-direction: column;
   padding: clamp(1rem, 2vw, 1.5rem);
   flex: 1;
+  min-width: 0;
 }
 
 /* Row 1: Product Name & Rating Badge */
@@ -70,6 +74,7 @@
   align-items: baseline;
   gap: 0.75rem;
   margin-bottom: 0.85rem;
+  min-width: 0;
 }
 
 .product-name {
@@ -79,6 +84,8 @@
   color: var(--color-olive, #4F5039);
   margin: 0;
   line-height: 1.25;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 .product-rating {
@@ -89,6 +96,7 @@
   padding: 0.2rem 0.6rem;
   border-radius: 9999px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Row 2: Price on the left, Add to Cart on the right with full clearance */
@@ -100,6 +108,7 @@
   padding-top: 1rem;
   border-top: 1px solid rgba(79, 80, 57, 0.08);
   margin-top: auto;
+  flex-wrap: wrap;
 }
 
 .product-price {
@@ -133,7 +142,7 @@
   }
 
   .product-info {
-    padding: 1rem 0.85rem 1.25rem;
+    padding: 0.95rem 0.85rem 1.15rem;
   }
 
   .product-action {

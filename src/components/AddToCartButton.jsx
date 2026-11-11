@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useFineHover } from '@/lib/useFineHover';
 import { useCart } from '../context/useCart';
 import './AddToCartButton.css';
 
@@ -21,7 +22,17 @@ const AddToCartButton = ({
   duration = 2400,
 }) => {
   const [isAdded, setIsAdded] = useState(false);
+  const timerRef = useRef(null);
   const { addToCart } = useCart();
+  const fineHover = useFineHover();
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   const handleClick = (e) => {
     e.stopPropagation();
@@ -43,8 +54,12 @@ const AddToCartButton = ({
       onAdd(product);
     }
 
-    setTimeout(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
       setIsAdded(false);
+      timerRef.current = null;
     }, duration);
   };
 
@@ -54,7 +69,7 @@ const AddToCartButton = ({
       className={`luxury-cart-btn ${isAdded ? 'is-added' : ''} ${className}`}
       onClick={handleClick}
       layout
-      whileHover={{ scale: 1.03 }}
+      whileHover={fineHover ? { scale: 1.03 } : undefined}
       whileTap={{ scale: 0.95 }}
       transition={{
         layout: { duration: 0.35, ease: [0.22, 1, 0.36, 1] },

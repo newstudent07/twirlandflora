@@ -1,9 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AmbientGardenEngine } from '@/lib/ambientMusic';
+import {
+  AmbientGardenEngine,
+  DEFAULT_TRACK_ID,
+  MUSIC_TRACKS,
+} from '@/lib/ambientMusic';
 import './BackgroundMusic.css';
 
 const STORAGE_ENABLED_KEY = 'twirl_flora_music_enabled';
 const STORAGE_VOLUME_KEY = 'twirl_flora_music_volume';
+const STORAGE_TRACK_KEY = 'twirl_flora_music_track';
 
 function readStoredEnabled() {
   try {
@@ -22,23 +27,41 @@ function readStoredVolume() {
   }
 }
 
+function readStoredTrackId() {
+  try {
+    const saved = localStorage.getItem(STORAGE_TRACK_KEY);
+    if (saved && MUSIC_TRACKS.some((t) => t.id === saved)) {
+      return saved;
+    }
+    return DEFAULT_TRACK_ID;
+  } catch {
+    return DEFAULT_TRACK_ID;
+  }
+}
+
 const BackgroundMusic = () => {
   const initialEnabled = readStoredEnabled();
   const initialVolume = readStoredVolume();
+  const initialTrackId = readStoredTrackId();
 
   const [volume, setVolume] = useState(initialVolume);
+  const [trackId, setTrackId] = useState(initialTrackId);
   const [status, setStatus] = useState(() => (initialEnabled ? 'awaiting' : 'paused'));
-  const [showVolume, setShowVolume] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
 
   const engineRef = useRef(null);
   const widgetRef = useRef(null);
   const enabledRef = useRef(initialEnabled);
   const initialVolumeRef = useRef(initialVolume);
+  const initialTrackRef = useRef(initialTrackId);
   const removeUnlockRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
-    const engine = new AmbientGardenEngine(initialVolumeRef.current);
+    const engine = new AmbientGardenEngine(
+      initialVolumeRef.current,
+      initialTrackRef.current
+    );
     engineRef.current = engine;
 
     const detachUnlockListeners = () => {
@@ -99,19 +122,19 @@ const BackgroundMusic = () => {
     };
   }, []);
 
-  // Close volume popover when clicking outside or pressing Escape
+  // Close drawer when clicking outside or pressing Escape
   useEffect(() => {
-    if (!showVolume) return undefined;
+    if (!showDrawer) return undefined;
 
     const handleOutsideClick = (event) => {
       if (widgetRef.current && !widgetRef.current.contains(event.target)) {
-        setShowVolume(false);
+        setShowDrawer(false);
       }
     };
 
     const handleEscape = (event) => {
       if (event.key === 'Escape') {
-        setShowVolume(false);
+        setShowDrawer(false);
       }
     };
 
@@ -122,7 +145,7 @@ const BackgroundMusic = () => {
       document.removeEventListener('pointerdown', handleOutsideClick);
       window.removeEventListener('keydown', handleEscape);
     };
-  }, [showVolume]);
+  }, [showDrawer]);
 
   const persistEnabled = (value) => {
     try {
@@ -140,6 +163,21 @@ const BackgroundMusic = () => {
     }
   };
 
+  const persistTrackId = (nextId) => {
+    try {
+      localStorage.setItem(STORAGE_TRACK_KEY, nextId);
+    } catch {
+      // Ignore storage quota / privacy mode errors
+    }
+  };
+
+  const clearPendingUnlock = () => {
+    if (removeUnlockRef.current) {
+      removeUnlockRef.current();
+      removeUnlockRef.current = null;
+    }
+  };
+
   const handleTogglePlay = () => {
     const engine = engineRef.current;
     if (!engine) return;
@@ -154,17 +192,37 @@ const BackgroundMusic = () => {
 
     enabledRef.current = true;
     persistEnabled(true);
-
-    if (removeUnlockRef.current) {
-      removeUnlockRef.current();
-      removeUnlockRef.current = null;
-    }
+    clearPendingUnlock();
 
     engine.start().then((started) => {
       if (started) {
         setStatus('playing');
       }
     });
+  };
+
+  const handleSelectTrack = (nextId) => {
+    setTrackId(nextId);
+    persistTrackId(nextId);
+
+    const engine = engineRef.current;
+    if (!engine) return;
+
+    enabledRef.current = true;
+    persistEnabled(true);
+    clearPendingUnlock();
+
+    engine.setTrack(nextId, { autoStart: true }).then((playing) => {
+      if (playing) {
+        setStatus('playing');
+      }
+    });
+  };
+
+  const handleNextTrack = () => {
+    const currentIdx = MUSIC_TRACKS.findIndex((t) => t.id === trackId);
+    const nextIdx = (currentIdx + 1) % MUSIC_TRACKS.length;
+    handleSelectTrack(MUSIC_TRACKS[nextIdx].id);
   };
 
   const handleVolumeChange = (event) => {
@@ -180,10 +238,7 @@ const BackgroundMusic = () => {
     if (nextVol > 0 && status !== 'playing') {
       enabledRef.current = true;
       persistEnabled(true);
-      if (removeUnlockRef.current) {
-        removeUnlockRef.current();
-        removeUnlockRef.current = null;
-      }
+      clearPendingUnlock();
       engine.start().then((started) => {
         if (started) {
           setStatus('playing');
@@ -192,15 +247,23 @@ const BackgroundMusic = () => {
     }
   };
 
+  const activeIndex = Math.max(
+    0,
+    MUSIC_TRACKS.findIndex((t) => t.id === trackId)
+  );
+  const activeTrack = MUSIC_TRACKS[activeIndex] || MUSIC_TRACKS[0];
+
   const statusLabel =
     status === 'playing'
-      ? 'Playing'
+      ? activeTrack.subtitle
       : status === 'awaiting'
         ? 'Tap to listen'
         : 'Muted';
 
   const toggleAriaLabel =
-    status === 'playing' ? 'Mute soothing background music' : 'Play soothing background music';
+    status === 'playing'
+      ? `Pause ${activeTrack.title}`
+      : `Play ${activeTrack.title}`;
 
   return (
     <aside
@@ -209,23 +272,70 @@ const BackgroundMusic = () => {
       data-music-control="true"
       aria-label="Background music controls"
     >
-      {showVolume && (
-        <div className="ambient-volume-popover" role="region" aria-label="Volume control">
-          <label htmlFor="ambient-volume-range" className="ambient-volume-label">
-            Volume
-          </label>
-          <input
-            id="ambient-volume-range"
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={handleVolumeChange}
-            className="ambient-volume-slider"
-            aria-label="Background music volume"
-          />
-          <span className="ambient-volume-pct">{Math.round(volume * 100)}%</span>
+      {showDrawer && (
+        <div
+          className="ambient-soundscape-popover"
+          role="region"
+          aria-label="Soundscape tracks and volume"
+        >
+          <div className="ambient-popover-header">
+            <span className="ambient-popover-heading">Botanical Soundscape</span>
+            <span className="ambient-track-counter">
+              {activeIndex + 1} / {MUSIC_TRACKS.length}
+            </span>
+          </div>
+
+          <div className="ambient-track-list" role="radiogroup" aria-label="Select background track">
+            {MUSIC_TRACKS.map((track) => {
+              const isSelected = track.id === activeTrack.id;
+              return (
+                <button
+                  key={track.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  className={`ambient-track-item ${isSelected ? 'is-active' : ''}`}
+                  onClick={() => handleSelectTrack(track.id)}
+                >
+                  <span className="ambient-track-info">
+                    <span className="ambient-track-name">{track.title}</span>
+                    <span className="ambient-track-sub">{track.subtitle}</span>
+                  </span>
+                  {isSelected && (
+                    <span className="ambient-track-badge" aria-hidden="true">
+                      {status === 'playing' ? (
+                        <span className="ambient-mini-bars">
+                          <span />
+                          <span />
+                          <span />
+                        </span>
+                      ) : (
+                        <span className="ambient-active-dot" />
+                      )}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="ambient-volume-row">
+            <label htmlFor="ambient-volume-range" className="ambient-volume-label">
+              Volume
+            </label>
+            <input
+              id="ambient-volume-range"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={handleVolumeChange}
+              className="ambient-volume-slider"
+              aria-label="Background music volume"
+            />
+            <span className="ambient-volume-pct">{Math.round(volume * 100)}%</span>
+          </div>
         </div>
       )}
 
@@ -269,18 +379,33 @@ const BackgroundMusic = () => {
           </span>
 
           <span className="ambient-meta">
-            <span className="ambient-title">Garden Melody</span>
+            <span className="ambient-title">{activeTrack.title}</span>
             <span className="ambient-status">{statusLabel}</span>
           </span>
         </button>
 
+        <span className="ambient-pill-divider" aria-hidden="true" />
+
         <button
           type="button"
-          className={`ambient-volume-btn ${showVolume ? 'active' : ''}`}
-          onClick={() => setShowVolume((prev) => !prev)}
-          aria-label="Adjust music volume"
-          aria-expanded={showVolume}
-          title="Adjust volume"
+          className="ambient-icon-btn"
+          onClick={handleNextTrack}
+          aria-label="Switch to next track"
+          title="Next track"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="5 4 15 12 5 20 5 4" />
+            <line x1="19" y1="5" x2="19" y2="19" />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          className={`ambient-icon-btn ${showDrawer ? 'active' : ''}`}
+          onClick={() => setShowDrawer((prev) => !prev)}
+          aria-label="Choose track and adjust volume"
+          aria-expanded={showDrawer}
+          title="Tracks & volume"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="4" y1="21" x2="4" y2="14" />
@@ -300,4 +425,3 @@ const BackgroundMusic = () => {
 };
 
 export default BackgroundMusic;
-

@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useFineHover } from '@/lib/useFineHover';
 import './KeychainHeroVisual.css';
 
 /**
@@ -24,6 +25,7 @@ const KeychainHeroVisual = ({
 }) => {
   const cardRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
+  const fineHover = useFineHover();
 
   // Motion values for smooth 3D tilt tracking
   const mouseX = useMotionValue(0.5);
@@ -51,7 +53,7 @@ const KeychainHeroVisual = ({
   const glareY = useTransform(smoothMouseY, [0, 1], [15, 85]);
 
   const handleMouseMove = (e) => {
-    if (!cardRef.current) return;
+    if (!fineHover || !cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
@@ -60,6 +62,7 @@ const KeychainHeroVisual = ({
   };
 
   const handleMouseEnter = () => {
+    if (!fineHover) return;
     setIsHovered(true);
   };
 
@@ -120,7 +123,7 @@ const KeychainHeroVisual = ({
             transformPerspective: 1100,
             transformStyle: 'preserve-3d',
           }}
-          whileHover={{ scale: 1.025 }}
+          whileHover={fineHover ? { scale: 1.025 } : undefined}
           transition={{ duration: 0.35, ease: 'easeOut' }}
         >
           {/* Main Visual Frame */}

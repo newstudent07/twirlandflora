@@ -2,46 +2,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
 }
-
-/* Navbar */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md) 0;
-  border-bottom: 1px solid rgba(98, 93, 85, 0.05);
-}
-
-.nav-brand {
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-olive);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.nav-links {
-  display: flex;
-  gap: var(--spacing-lg);
-  align-items: center;
-}
-
-.nav-link {
-  font-weight: 500;
-  font-size: 0.875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-charcoal);
-  transition: color 0.2s;
-}
-
-.nav-link:hover {
-  color: var(--color-olive);
-}
-
-
 
 /* Products Section */
 .section-title {

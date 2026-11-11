@@ -1,6 +1,6 @@
 .category-section {
   padding: clamp(2rem, 5vw, 3.5rem) 0;
-  overflow: hidden;
+  overflow-x: clip;
   width: 100%;
 }
 
@@ -11,19 +11,23 @@
 }
 
 .category-grid {
+  --marquee-gap: 2rem;
   display: flex;
-  gap: clamp(1rem, 2.5vw, 2rem);
+  gap: var(--marquee-gap);
   width: max-content;
+  will-change: transform;
   animation: slideMarquee 26s linear infinite;
 }
 
-.category-grid:hover {
-  animation-play-state: paused;
+@media (hover: hover) and (pointer: fine) {
+  .category-grid:hover {
+    animation-play-state: paused;
+  }
 }
 
 @keyframes slideMarquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(calc(-50% - (clamp(1rem, 2.5vw, 2rem) / 2))); }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(calc(-50% - (var(--marquee-gap) / 2)), 0, 0); }
 }
 
 .category-card {
@@ -38,11 +42,6 @@
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
 }
 
-.category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 36px rgba(79, 80, 57, 0.14);
-}
-
 .category-img {
   width: 100%;
   height: 100%;
@@ -50,8 +49,15 @@
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.category-card:hover .category-img {
-  transform: scale(1.06);
+@media (hover: hover) and (pointer: fine) {
+  .category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(79, 80, 57, 0.14);
+  }
+
+  .category-card:hover .category-img {
+    transform: scale(1.06);
+  }
 }
 
 .category-overlay {
@@ -74,26 +80,53 @@
 }
 
 @media (max-width: 992px) {
+  .category-grid {
+    --marquee-gap: 1.5rem;
+  }
+
   .category-card {
-    width: 250px;
+    width: 245px;
     border-radius: var(--radius-md);
   }
 }
 
 @media (max-width: 640px) {
-  .category-card {
-    width: 210px;
-    border-radius: 1.25rem;
-  }
-  
   .category-grid {
-    animation-duration: 20s;
+    --marquee-gap: 1.15rem;
+    animation-duration: 22s;
+  }
+
+  .category-card {
+    width: 205px;
+    border-radius: 1.25rem;
   }
 }
 
 @media (max-width: 380px) {
+  .category-grid {
+    --marquee-gap: 0.9rem;
+    animation-duration: 19s;
+  }
+
   .category-card {
-    width: 180px;
+    width: 172px;
     border-radius: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-marquee-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .category-marquee-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .category-grid {
+    animation: none !important;
+    transform: none !important;
   }
 }

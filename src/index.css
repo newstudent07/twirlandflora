@@ -27,7 +27,8 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
 }
 
 * {
@@ -43,14 +44,17 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
   position: relative;
   width: 100%;
 }
 
 #root, .app {
   width: 100%;
-  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -104,9 +108,8 @@ button {
   color: var(--color-white);
 }
 
-.btn-primary:hover {
-  background-color: #b8706f;
-  transform: translateY(-2px);
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
 .btn-secondary {
@@ -114,8 +117,8 @@ button {
   color: var(--color-olive);
 }
 
-.btn-secondary:hover {
-  background-color: rgba(79, 80, 57, 0.05);
+.btn-secondary:active {
+  background-color: rgba(79, 80, 57, 0.08);
 }
 
 /* Card styles */
@@ -124,12 +127,40 @@ button {
   border: var(--border-thin);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-ambient);
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:hover {
+    background-color: #b8706f;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary:hover {
+    background-color: rgba(79, 80, 57, 0.05);
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-ambient);
+  }
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-rose);
+  outline-offset: 2px;
+}
+
+@media (max-width: 360px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  .btn {
+    padding: 0.7rem 1.35rem;
+    font-size: 13px;
+  }
 }
 
 /* Organic Arch Images */

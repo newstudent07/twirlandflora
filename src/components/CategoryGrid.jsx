@@ -13,7 +13,7 @@ const CategoryGrid = () => {
 
   return (
     <section className="category-section">
-      <div className="container" style={{ overflow: 'hidden' }}>
+      <div className="container" style={{ overflow: 'clip' }}>
         <h2 className="text-center mb-lg reveal">Shop by Category</h2>
         <div className="category-marquee-container reveal delay-1">
           <div className="category-grid">

@@ -30,7 +30,7 @@
   width: 100%;
   min-height: 350vh;
   background: linear-gradient(180deg, #FDF7ED 0%, #FFFFFF 15%, #FAF7F2 65%, #FDF7ED 100%);
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .skiper-svg-canvas {

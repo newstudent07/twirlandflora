@@ -10,13 +10,13 @@ const SearchModal = () => {
   const inputRef = useRef(null);
   const navigate = useNavigate();
 
-  // Focus input automatically when search opens
+  // Focus input automatically when search opens (cleanup timer on close/unmount)
   useEffect(() => {
-    if (isSearchOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 50);
-    }
+    if (!isSearchOpen) return undefined;
+    const focusTimer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
+    return () => clearTimeout(focusTimer);
   }, [isSearchOpen]);
 
   if (!isSearchOpen) {
@@ -146,7 +146,10 @@ const SearchModal = () => {
                       role="button"
                       tabIndex={0}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleCategoryClick(cat.slug);
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleCategoryClick(cat.slug);
+                        }
                       }}
                     >
                       <div className="search-cat-img-box">
@@ -226,8 +229,15 @@ const SearchModal = () => {
                         <div
                           className="search-product-image-box"
                           onClick={() => handleCategoryClick(product.category)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleCategoryClick(product.category);
+                            }
+                          }}
                           role="button"
                           tabIndex={0}
+                          aria-label={`View ${product.categoryName} collection`}
                         >
                           <img
                             src={product.image}
@@ -247,6 +257,12 @@ const SearchModal = () => {
                           <h4
                             className="search-product-name"
                             onClick={() => handleCategoryClick(product.category)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                handleCategoryClick(product.category);
+                              }
+                            }}
                             role="button"
                             tabIndex={0}
                           >
@@ -278,11 +294,14 @@ const SearchModal = () => {
 
         {/* Modal Footer / Keyboard Shortcuts Guide */}
         <div className="search-modal-footer">
-          <div className="search-footer-hint">
+          <div className="search-footer-hint search-desktop-hint">
             <span className="footer-kbd">ESC</span> to close
           </div>
-          <div className="search-footer-hint">
+          <div className="search-footer-hint search-desktop-hint">
             <span className="footer-kbd">/</span> quick search
+          </div>
+          <div className="search-mobile-hint">
+            Tap any creation or collection to explore
           </div>
           <div className="search-footer-brand">
             Twirl &amp; Flora • Artisan Botanical Boutique

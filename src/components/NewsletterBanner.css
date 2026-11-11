@@ -57,6 +57,28 @@
   flex-shrink: 0;
 }
 
+.newsletter-feedback {
+  margin: 0.9rem 0 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 500;
+  line-height: 1.45;
+  opacity: 1 !important;
+}
+
+.newsletter-feedback.is-success {
+  color: #FDF7ED;
+}
+
+.newsletter-feedback.is-error {
+  color: #FECACA;
+}
+
+@media (max-width: 768px) {
+  .newsletter-input {
+    font-size: 16px; /* Prevents iOS auto-zoom on focus */
+  }
+}
+
 @media (max-width: 520px) {
   .newsletter-input-group {
     flex-direction: column;

@@ -11,7 +11,7 @@ const ScrollReveal = () => {
           }
         });
       },
-      { threshold: 0.05, rootMargin: '0px 0px -10px 0px' }
+      { threshold: 0.01, rootMargin: '80px 0px 80px 0px' }
     );
 
     const observeElements = () => {

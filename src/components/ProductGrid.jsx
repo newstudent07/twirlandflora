@@ -1,26 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useFineHover } from '@/lib/useFineHover';
 import AddToCartButton from './AddToCartButton';
 import './ProductGrid.css';
 
 const ProductGrid = ({ title = "Best Sellers", products = [] }) => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
+  const fineHover = useFineHover();
 
   const cardVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.97 },
+    hidden: { opacity: 0, y: 26, scale: 0.97 },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
-      transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] },
+      transition: { duration: 0.45, ease: [0.25, 1, 0.5, 1] },
     },
   };
 
@@ -31,25 +24,23 @@ const ProductGrid = ({ title = "Best Sellers", products = [] }) => {
           className="section-header"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
+          viewport={{ once: true, amount: 0.05 }}
+          transition={{ duration: 0.55 }}
         >
           <h2 className="mb-lg">{title}</h2>
         </motion.div>
-        
-        <motion.div
-          className="product-grid"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-        >
-          {products.map((product) => {
+
+        <div className="product-grid">
+          {products.map((product, idx) => {
             return (
               <motion.div
                 key={product.id}
                 variants={cardVariants}
-                whileHover={{ y: -8, transition: { duration: 0.25, ease: 'easeOut' } }}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.02 }}
+                transition={{ delay: Math.min(idx * 0.06, 0.24) }}
+                whileHover={fineHover ? { y: -8, transition: { duration: 0.25, ease: 'easeOut' } } : undefined}
                 className="card product-card"
               >
                 <div className="product-image-container">
@@ -57,7 +48,8 @@ const ProductGrid = ({ title = "Best Sellers", products = [] }) => {
                     src={product.image}
                     alt={product.name}
                     className="product-img"
-                    whileHover={{ scale: 1.05 }}
+                    loading="lazy"
+                    whileHover={fineHover ? { scale: 1.05 } : undefined}
                     transition={{ duration: 0.4 }}
                   />
                 </div>
@@ -78,7 +70,7 @@ const ProductGrid = ({ title = "Best Sellers", products = [] }) => {
               </motion.div>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
