@@ -230,6 +230,50 @@ function createPinkNoiseBuffer(ctx, durationSeconds = 4) {
   return buffer;
 }
 
+let cachedSilentWavUrl = null;
+
+function getSilentWavDataUri() {
+  if (cachedSilentWavUrl) return cachedSilentWavUrl;
+
+  try {
+    const sampleRate = 8000;
+    const numSamples = 1600; // 0.2s silent 16-bit mono PCM WAV
+    const dataSize = numSamples * 2;
+    const buffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(buffer);
+
+    const writeAscii = (offset, text) => {
+      for (let i = 0; i < text.length; i += 1) {
+        view.setUint8(offset + i, text.charCodeAt(i));
+      }
+    };
+
+    writeAscii(0, 'RIFF');
+    view.setUint32(4, 36 + dataSize, true);
+    writeAscii(8, 'WAVE');
+    writeAscii(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, 1, true); // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeAscii(36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 1) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    cachedSilentWavUrl = `data:audio/wav;base64,${btoa(binary)}`;
+    return cachedSilentWavUrl;
+  } catch {
+    return null;
+  }
+}
+
 // ============================================================================
 // Engine Implementation
 // ============================================================================
@@ -241,6 +285,7 @@ export class AmbientGardenEngine {
     this.reverbSend = null;
     this.delaySend = null;
     this.pinkNoiseBuffer = null;
+    this.keepAliveAudio = null;
 
     this.volume = Math.min(1, Math.max(0, initialVolume));
     this.trackId = TRACK_MAP.has(initialTrackId) ? initialTrackId : DEFAULT_TRACK_ID;
@@ -252,19 +297,183 @@ export class AmbientGardenEngine {
     this.schedulerTimer = null;
     this.suspendTimer = null;
     this.cleanupTimers = new Set();
+    this.startPromise = null;
+    this.onStateChange = null;
+    this.handleCtxStateChange = null;
 
     this.stepIndex = 0;
     this.nextStepTime = 0;
   }
 
+  setStateChangeHandler(handler) {
+    this.onStateChange = typeof handler === 'function' ? handler : null;
+  }
+
+  configureAudioSession() {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.audioSession) {
+        navigator.audioSession.type = 'playback';
+      }
+    } catch {
+      // Ignore unsupported audioSession APIs
+    }
+  }
+
+  ensureKeepAliveAudio() {
+    if (this.keepAliveAudio || typeof Audio === 'undefined') return this.keepAliveAudio;
+
+    const src = getSilentWavDataUri();
+    if (!src) return null;
+
+    try {
+      const audio = new Audio(src);
+      audio.loop = true;
+      audio.preload = 'auto';
+      audio.volume = 1;
+      audio.playsInline = true;
+      audio.setAttribute('playsinline', '');
+      audio.setAttribute('webkit-playsinline', '');
+      this.keepAliveAudio = audio;
+      return audio;
+    } catch {
+      return null;
+    }
+  }
+
+  startKeepAliveAudio() {
+    const audio = this.ensureKeepAliveAudio();
+    if (!audio || !audio.paused) return;
+
+    try {
+      const playPromise = audio.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    } catch {
+      // Ignore autoplay errors outside gesture
+    }
+  }
+
+  stopKeepAliveAudio() {
+    if (!this.keepAliveAudio) return;
+    try {
+      if (!this.keepAliveAudio.paused) {
+        this.keepAliveAudio.pause();
+      }
+    } catch {
+      // Ignore pause errors
+    }
+  }
+
+  playSilentWebAudioPulse(ctx) {
+    if (!ctx) return;
+    try {
+      const silentBuffer = ctx.createBuffer(1, 1, 22050);
+      const source = ctx.createBufferSource();
+      source.buffer = silentBuffer;
+      source.connect(ctx.destination);
+      source.start(0);
+    } catch {
+      // Ignore pulse failures
+    }
+  }
+
+  unlockFromGesture() {
+    if (this.isDestroyed) return;
+
+    this.configureAudioSession();
+    let ctx = this.ensureContext();
+    if (ctx && ctx.state === 'closed') {
+      this.resetContext();
+      ctx = this.ensureContext();
+    }
+
+    if (ctx) {
+      this.playSilentWebAudioPulse(ctx);
+      if (ctx.state !== 'running') {
+        try {
+          const resumePromise = ctx.resume();
+          if (resumePromise && typeof resumePromise.catch === 'function') {
+            resumePromise.catch(() => {});
+          }
+        } catch {
+          // Ignore resume sync error
+        }
+      }
+    }
+
+    this.startKeepAliveAudio();
+  }
+
+  resetContext() {
+    this.stopScheduler();
+
+    if (this.session) {
+      this.session.continuousNodes.forEach((node) => {
+        try {
+          if (typeof node.stop === 'function') node.stop();
+        } catch {
+          // Ignore already stopped
+        }
+        try {
+          node.disconnect();
+        } catch {
+          // Ignore disconnect errors
+        }
+      });
+      this.session = null;
+    }
+
+    this.isPlaying = false;
+
+    if (this.ctx) {
+      const oldCtx = this.ctx;
+      if (this.handleCtxStateChange) {
+        oldCtx.removeEventListener('statechange', this.handleCtxStateChange);
+        this.handleCtxStateChange = null;
+      }
+      this.ctx = null;
+      this.masterGain = null;
+      this.dryBus = null;
+      this.reverbSend = null;
+      this.delaySend = null;
+      this.pinkNoiseBuffer = null;
+      if (oldCtx.state !== 'closed') {
+        oldCtx.close().catch(() => {});
+      }
+    }
+  }
+
   ensureContext() {
-    if (this.ctx || this.isDestroyed) return this.ctx;
+    if (this.isDestroyed) return null;
+    if (this.ctx && this.ctx.state === 'closed') {
+      this.resetContext();
+    }
+    if (this.ctx) return this.ctx;
 
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return null;
 
     const ctx = new AudioCtx();
     this.ctx = ctx;
+
+    this.handleCtxStateChange = () => {
+      if (ctx !== this.ctx || this.isDestroyed) return;
+      if (this.isPlaying && ctx.state !== 'running') {
+        this.isPlaying = false;
+        this.stopScheduler();
+        if (this.session) {
+          this.endSession(this.session, 0.12);
+          this.session = null;
+        }
+        this.stopKeepAliveAudio();
+        if (this.onStateChange) {
+          this.onStateChange('awaiting');
+        }
+      }
+    };
+    ctx.addEventListener('statechange', this.handleCtxStateChange);
+
     this.pinkNoiseBuffer = createPinkNoiseBuffer(ctx, 4);
 
     // Master chain: warm filter -> high-shelf tame -> compressor -> masterGain
@@ -376,45 +585,97 @@ export class AmbientGardenEngine {
     return this.ctx.state;
   }
 
-  async start() {
-    if (this.isDestroyed) return false;
-
-    const ctx = this.ensureContext();
-    if (!ctx) return false;
-
-    if (this.suspendTimer) {
-      clearTimeout(this.suspendTimer);
-      this.suspendTimer = null;
-    }
-
-    if (ctx.state === 'suspended') {
-      try {
-        await ctx.resume();
-      } catch {
-        return false;
-      }
-    }
-
-    if (ctx.state !== 'running') {
+  async resumeContextSafely(ctx, timeoutMs = 150) {
+    if (!ctx || ctx.state === 'running') return true;
+    try {
+      await Promise.race([
+        ctx.resume().catch(() => {}),
+        new Promise((resolve) => {
+          setTimeout(resolve, timeoutMs);
+        }),
+      ]);
+    } catch {
       return false;
     }
+    return ctx.state === 'running';
+  }
 
-    const now = ctx.currentTime;
-    const target = Math.max(0.0001, this.volume * 0.52);
-    this.masterGain.gain.cancelScheduledValues(now);
-    this.masterGain.gain.setValueAtTime(Math.max(0.0001, this.masterGain.gain.value), now);
-    this.masterGain.gain.linearRampToValueAtTime(target, now + 0.9);
+  start({ fromUserGesture = false } = {}) {
+    if (this.isDestroyed) return Promise.resolve(false);
 
-    if (!this.isPlaying) {
-      this.isPlaying = true;
-      this.beginSession();
-      this.startScheduler();
+    // Run audio unlock primitives synchronously inside user activation before any awaits
+    if (fromUserGesture) {
+      this.unlockFromGesture();
     }
 
-    return true;
+    if (this.startPromise) {
+      return this.startPromise.then((alreadyStarted) => {
+        if (alreadyStarted || !fromUserGesture || this.isDestroyed) {
+          return alreadyStarted;
+        }
+        return this.start({ fromUserGesture: true });
+      });
+    }
+
+    const run = (async () => {
+      let ctx = this.ensureContext();
+      if (!ctx) return false;
+
+      if (this.suspendTimer) {
+        clearTimeout(this.suspendTimer);
+        this.suspendTimer = null;
+      }
+
+      if (ctx.state !== 'running') {
+        await this.resumeContextSafely(ctx, fromUserGesture ? 650 : 120);
+
+        // Some mobile WebViews permanently lock an AudioContext created outside a gesture
+        if (!this.isDestroyed && ctx.state !== 'running' && fromUserGesture) {
+          this.resetContext();
+          ctx = this.ensureContext();
+          if (ctx) {
+            this.playSilentWebAudioPulse(ctx);
+            await this.resumeContextSafely(ctx, 500);
+          }
+        }
+      }
+
+      if (this.isDestroyed || !ctx || ctx.state !== 'running') {
+        return false;
+      }
+
+      this.configureAudioSession();
+      if (fromUserGesture) {
+        this.startKeepAliveAudio();
+      }
+
+      const now = ctx.currentTime;
+      const target = Math.max(0.0001, this.volume * 0.52);
+      this.masterGain.gain.cancelScheduledValues(now);
+      this.masterGain.gain.setValueAtTime(Math.max(0.0001, this.masterGain.gain.value), now);
+      this.masterGain.gain.linearRampToValueAtTime(target, now + 0.9);
+
+      if (!this.isPlaying) {
+        this.isPlaying = true;
+        this.beginSession();
+        this.startScheduler();
+      }
+
+      return true;
+    })();
+
+    this.startPromise = run.finally(() => {
+      if (this.startPromise === guarded) {
+        this.startPromise = null;
+      }
+    });
+    const guarded = this.startPromise;
+    return guarded;
   }
 
   pause() {
+    this.stopKeepAliveAudio();
+
     if (!this.ctx) {
       this.isPlaying = false;
       return;
@@ -457,8 +718,12 @@ export class AmbientGardenEngine {
     }
   }
 
-  async setTrack(nextTrackId, { autoStart = false } = {}) {
+  async setTrack(nextTrackId, { autoStart = false, fromUserGesture = false } = {}) {
     if (!TRACK_MAP.has(nextTrackId) || this.isDestroyed) return false;
+
+    if (autoStart && fromUserGesture) {
+      this.unlockFromGesture();
+    }
 
     const changed = this.trackId !== nextTrackId;
     this.trackId = nextTrackId;
@@ -478,7 +743,7 @@ export class AmbientGardenEngine {
     }
 
     if (autoStart) {
-      return this.start();
+      return this.start({ fromUserGesture });
     }
 
     return false;
@@ -594,14 +859,15 @@ export class AmbientGardenEngine {
     const lookahead = 0.24;
 
     // Resync cleanly if the browser tab was backgrounded/throttled
-    if (this.nextStepTime < ctx.currentTime - 0.15) {
-      this.nextStepTime = ctx.currentTime + 0.04;
+    if (this.nextStepTime < ctx.currentTime - 0.05) {
+      this.nextStepTime = ctx.currentTime + 0.025;
     }
 
     const track = TRACK_MAP.get(this.session.trackId) || MUSIC_TRACKS[0];
 
     while (this.nextStepTime < ctx.currentTime + lookahead) {
-      this.scheduleStep(this.session, this.stepIndex, this.nextStepTime);
+      const safeTime = Math.max(ctx.currentTime + 0.008, this.nextStepTime);
+      this.scheduleStep(this.session, this.stepIndex, safeTime);
       this.nextStepTime += track.stepDuration;
       this.stepIndex += 1;
     }
@@ -1469,7 +1735,19 @@ export class AmbientGardenEngine {
   destroy() {
     this.isDestroyed = true;
     this.isPlaying = false;
+    this.onStateChange = null;
     this.stopScheduler();
+    this.stopKeepAliveAudio();
+
+    if (this.keepAliveAudio) {
+      try {
+        this.keepAliveAudio.removeAttribute('src');
+        this.keepAliveAudio.load();
+      } catch {
+        // Ignore cleanup error
+      }
+      this.keepAliveAudio = null;
+    }
 
     if (this.suspendTimer) {
       clearTimeout(this.suspendTimer);
@@ -1497,8 +1775,14 @@ export class AmbientGardenEngine {
 
     if (this.ctx) {
       const ctxRef = this.ctx;
+      if (this.handleCtxStateChange) {
+        ctxRef.removeEventListener('statechange', this.handleCtxStateChange);
+        this.handleCtxStateChange = null;
+      }
       this.ctx = null;
-      ctxRef.close().catch(() => {});
+      if (ctxRef.state !== 'closed') {
+        ctxRef.close().catch(() => {});
+      }
     }
   }
 }

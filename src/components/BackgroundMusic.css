@@ -89,6 +89,7 @@
   border: 1px solid transparent;
   background: rgba(79, 80, 57, 0.04);
   cursor: pointer;
+  touch-action: manipulation;
   text-align: left;
   transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.15s ease;
 }
@@ -281,6 +282,7 @@
   border: none;
   background: transparent;
   cursor: pointer;
+  touch-action: manipulation;
   color: var(--color-olive, #4F5039);
   text-align: left;
   border-radius: var(--radius-full, 9999px);
@@ -444,6 +446,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  touch-action: manipulation;
   flex-shrink: 0;
   transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
 }

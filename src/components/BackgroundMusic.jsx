@@ -55,6 +55,8 @@ const BackgroundMusic = () => {
   const initialVolumeRef = useRef(initialVolume);
   const initialTrackRef = useRef(initialTrackId);
   const removeUnlockRef = useRef(null);
+  const attachUnlockRef = useRef(null);
+  const wasInterruptedByHideRef = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -72,17 +74,23 @@ const BackgroundMusic = () => {
     };
 
     const attachUnlockListeners = () => {
-      detachUnlockListeners();
+      if (removeUnlockRef.current || !isMounted) return;
 
       const handleFirstGesture = (event) => {
         if (!isMounted || !enabledRef.current || !engineRef.current) return;
 
-        // Let the widget's own click handler manage direct clicks on the music pill
+        if (engineRef.current.isPlaying) {
+          setStatus('playing');
+          detachUnlockListeners();
+          return;
+        }
+
+        // Let the widget's own click handler manage direct clicks on the music controls
         if (event.target && event.target.closest && event.target.closest('[data-music-control="true"]')) {
           return;
         }
 
-        engineRef.current.start().then((started) => {
+        engineRef.current.start({ fromUserGesture: true }).then((started) => {
           if (started && isMounted) {
             setStatus('playing');
             detachUnlockListeners();
@@ -90,7 +98,7 @@ const BackgroundMusic = () => {
         });
       };
 
-      const events = ['pointerdown', 'keydown', 'touchstart', 'click'];
+      const events = ['touchend', 'pointerup', 'click', 'keydown', 'touchstart'];
       events.forEach((evt) => {
         window.addEventListener(evt, handleFirstGesture, { passive: true, capture: true });
       });
@@ -102,20 +110,66 @@ const BackgroundMusic = () => {
       };
     };
 
+    attachUnlockRef.current = attachUnlockListeners;
+
+    engine.setStateChangeHandler((nextStatus) => {
+      if (!isMounted) return;
+      if (nextStatus === 'awaiting' && enabledRef.current) {
+        setStatus('awaiting');
+        attachUnlockListeners();
+      }
+    });
+
+    const handleVisibilityOrPageShow = () => {
+      if (!isMounted || !engineRef.current) return;
+
+      if (document.hidden) {
+        if (engineRef.current.isPlaying) {
+          wasInterruptedByHideRef.current = true;
+          engineRef.current.pause();
+          setStatus('awaiting');
+        }
+        return;
+      }
+
+      if (enabledRef.current && (wasInterruptedByHideRef.current || !engineRef.current.isPlaying)) {
+        wasInterruptedByHideRef.current = false;
+        attachUnlockListeners();
+        engineRef.current.start({ fromUserGesture: false }).then((started) => {
+          if (!isMounted) return;
+          if (started) {
+            setStatus('playing');
+            detachUnlockListeners();
+          } else {
+            setStatus('awaiting');
+          }
+        });
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityOrPageShow);
+    window.addEventListener('pageshow', handleVisibilityOrPageShow);
+
     if (enabledRef.current) {
-      engine.start().then((started) => {
+      // Attach unlock listeners immediately so first mobile tap is never missed
+      // while checking whether passive autoplay is permitted.
+      attachUnlockListeners();
+      engine.start({ fromUserGesture: false }).then((started) => {
         if (!isMounted) return;
         if (started) {
           setStatus('playing');
+          detachUnlockListeners();
         } else {
           setStatus('awaiting');
-          attachUnlockListeners();
         }
       });
     }
 
     return () => {
       isMounted = false;
+      attachUnlockRef.current = null;
+      document.removeEventListener('visibilitychange', handleVisibilityOrPageShow);
+      window.removeEventListener('pageshow', handleVisibilityOrPageShow);
       detachUnlockListeners();
       engine.destroy();
       engineRef.current = null;
@@ -182,21 +236,27 @@ const BackgroundMusic = () => {
     const engine = engineRef.current;
     if (!engine) return;
 
-    if (status === 'playing') {
+    if (status === 'playing' && engine.isPlaying) {
+      wasInterruptedByHideRef.current = false;
       enabledRef.current = false;
       persistEnabled(false);
+      clearPendingUnlock();
       engine.pause();
       setStatus('paused');
       return;
     }
 
+    wasInterruptedByHideRef.current = false;
     enabledRef.current = true;
     persistEnabled(true);
     clearPendingUnlock();
 
-    engine.start().then((started) => {
+    engine.start({ fromUserGesture: true }).then((started) => {
       if (started) {
         setStatus('playing');
+      } else if (enabledRef.current) {
+        setStatus('awaiting');
+        if (attachUnlockRef.current) attachUnlockRef.current();
       }
     });
   };
@@ -208,13 +268,17 @@ const BackgroundMusic = () => {
     const engine = engineRef.current;
     if (!engine) return;
 
+    wasInterruptedByHideRef.current = false;
     enabledRef.current = true;
     persistEnabled(true);
     clearPendingUnlock();
 
-    engine.setTrack(nextId, { autoStart: true }).then((playing) => {
+    engine.setTrack(nextId, { autoStart: true, fromUserGesture: true }).then((playing) => {
       if (playing) {
         setStatus('playing');
+      } else if (enabledRef.current) {
+        setStatus('awaiting');
+        if (attachUnlockRef.current) attachUnlockRef.current();
       }
     });
   };
@@ -235,13 +299,17 @@ const BackgroundMusic = () => {
 
     engine.setVolume(nextVol);
 
-    if (nextVol > 0 && status !== 'playing') {
+    if (nextVol > 0 && (status !== 'playing' || !engine.isPlaying)) {
+      wasInterruptedByHideRef.current = false;
       enabledRef.current = true;
       persistEnabled(true);
       clearPendingUnlock();
-      engine.start().then((started) => {
+      engine.start({ fromUserGesture: true }).then((started) => {
         if (started) {
           setStatus('playing');
+        } else if (enabledRef.current) {
+          setStatus('awaiting');
+          if (attachUnlockRef.current) attachUnlockRef.current();
         }
       });
     }
